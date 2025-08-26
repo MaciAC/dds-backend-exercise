@@ -27,6 +27,14 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::answer.answer"
+    },
+    "toAggregate": {
+      "type": "boolean",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
     }
   }
 }

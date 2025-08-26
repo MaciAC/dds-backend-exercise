@@ -1,0 +1,32 @@
+{
+  "kind": "collectionType",
+  "collectionName": "surveys",
+  "info": {
+    "singularName": "survey",
+    "pluralName": "surveys",
+    "displayName": "survey"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {
+    "i18n": {
+      "localized": true
+    }
+  },
+  "attributes": {
+    "description": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "questions": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::question.question"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "user_responses",
+  "info": {
+    "singularName": "user-response",
+    "pluralName": "user-responses",
+    "displayName": "userResponse"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "answers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::answer.answer"
+    },
+    "survey": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::survey.survey"
+    }
+  }
+}

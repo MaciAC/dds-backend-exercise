@@ -1,0 +1,26 @@
+{
+  "kind": "collectionType",
+  "collectionName": "survey_stats_memories",
+  "info": {
+    "singularName": "survey-stats-memory",
+    "pluralName": "survey-stats-memories",
+    "displayName": "surveyStatsMemory"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "survey": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::survey.survey"
+    },
+    "stats": {
+      "type": "json"
+    },
+    "lastUpdate": {
+      "type": "datetime"
+    }
+  }
+}

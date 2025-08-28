@@ -451,6 +451,37 @@ export interface ApiQuestionQuestion extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiSurveyStatsMemorySurveyStatsMemory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'survey_stats_memories';
+  info: {
+    displayName: 'surveyStatsMemory';
+    pluralName: 'survey-stats-memories';
+    singularName: 'survey-stats-memory';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    lastUpdate: Schema.Attribute.DateTime;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::survey-stats-memory.survey-stats-memory'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    stats: Schema.Attribute.JSON;
+    survey: Schema.Attribute.Relation<'oneToOne', 'api::survey.survey'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiSurveySurvey extends Struct.CollectionTypeSchema {
   collectionName: 'surveys';
   info: {
@@ -1027,6 +1058,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::answer.answer': ApiAnswerAnswer;
       'api::question.question': ApiQuestionQuestion;
+      'api::survey-stats-memory.survey-stats-memory': ApiSurveyStatsMemorySurveyStatsMemory;
       'api::survey.survey': ApiSurveySurvey;
       'api::user-response.user-response': ApiUserResponseUserResponse;
       'plugin::content-releases.release': PluginContentReleasesRelease;

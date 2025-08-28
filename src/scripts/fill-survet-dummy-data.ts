@@ -47,7 +47,7 @@ async function postUserResponse(responsePayload) {
 }
 
 // Example runner: generate N fake responses per survey!
-const N = 10000; // Number of fake users to create
+const N = 500000; // Number of fake users to create
 
 (async () => {
   try {

@@ -10,7 +10,8 @@ export default {
       if (!surveyDocumentId) {
         ctx.throw(400, "Survey documentId must be provided");
       }
-      // Fetch survey WITH locale
+
+      // === Fetch survey WITH locale ===
       const surveyData = (await strapi.entityService.findMany(
         "api::survey.survey",
         {
@@ -21,58 +22,87 @@ export default {
       )) as any[];
 
       if (!surveyData?.length) ctx.throw(404, "Survey not found");
-      const surveyRaw = surveyData[0] as any;
+      const surveyRaw = surveyData[0];
       const surveyId = surveyRaw.id;
 
-      // Fetch responses
-      const userResponses = (await strapi.entityService.findMany(
+      // Fetch surveyStatsMemory
+      const statsMemoryArray = await strapi.entityService.findMany(
+        "api::survey-stats-memory.survey-stats-memory",
+        {
+          filters: { survey: surveyId },
+          limit: 1,
+        }
+      );
+      const statsMemory = statsMemoryArray.length ? statsMemoryArray[0] : null;
+
+      // Use stats property, not content
+      let baselineStats = null;
+      let lastUpdate = null;
+
+      if (statsMemory) {
+        baselineStats = statsMemory.stats; // JSON with aggregated results
+        lastUpdate = new Date(statsMemory.updatedAt);
+      } else {
+        baselineStats = null;
+        lastUpdate = null;
+      }
+
+      // === Fetch only new responses (if memory exists) or all (if not) ===
+      const responseFilters: any = { survey: surveyId };
+      if (lastUpdate) {
+        responseFilters.createdAt = { $gt: lastUpdate }; // only newer responses
+      }
+
+      const newResponses = (await strapi.entityService.findMany(
         "api::user-response.user-response",
         {
-          filters: { survey: surveyId } as any,
-          fields: ['content'],  // Select only the "content" field
+          filters: responseFilters,
+          fields: ["content"],
         }
       )) as any[];
-      console.log("User Responses took ", Date.now() - start_time, "ms");
-      // === Separate dimensions vs targets ===
+
+      console.log(
+        `Fetched ${newResponses.length} new responses in`,
+        Date.now() - start_time,
+        "ms"
+      );
+
+      // === Questions: separate dimensions vs targets ===
       const dimensions = surveyRaw.questions.filter((q: any) => q.toAggregate);
       const targets = surveyRaw.questions.filter((q: any) => !q.toAggregate);
 
-      // === Setup breakdown structure ===
-      const breakdownStats: Record<
-        string, // targetQ
-        Record<
-          string, // targetAnswer
-          {
-            totalCount: number;
-            dimensions: Record<
-              string, // dimensionQ
-              Record<string, number> // dimensionAnswer -> count
-            >;
-          }
-        >
-      > = {};
-
-      targets.forEach((t: any) => {
-        breakdownStats[t.documentId] = {};
-        t.answers.forEach((ta: any) => {
-          breakdownStats[t.documentId][ta.documentId] = {
-            totalCount: 0,
-            dimensions: {},
-          };
-          dimensions.forEach((d: any) => {
-            breakdownStats[t.documentId][ta.documentId].dimensions[d.documentId] = {};
-            d.answers.forEach((da: any) => {
-              breakdownStats[t.documentId][ta.documentId].dimensions[d.documentId][
-                da.documentId
-              ] = 0;
+      // === Helper: Build empty stat structure ===
+      const initBreakdownStats = () => {
+        const breakdownStats: any = {};
+        targets.forEach((t: any) => {
+          breakdownStats[t.documentId] = {};
+          t.answers.forEach((ta: any) => {
+            breakdownStats[t.documentId][ta.documentId] = {
+              totalCount: 0,
+              dimensions: {},
+            };
+            dimensions.forEach((d: any) => {
+              breakdownStats[t.documentId][ta.documentId].dimensions[
+                d.documentId
+              ] = {};
+              d.answers.forEach((da: any) => {
+                breakdownStats[t.documentId][ta.documentId].dimensions[
+                  d.documentId
+                ][da.documentId] = 0;
+              });
             });
           });
         });
-      });
+        return breakdownStats;
+      };
 
-      // === Aggregate ===
-      userResponses.forEach((ur: any) => {
+      // Start stats from memory OR fresh empty
+      let breakdownStats = baselineStats ?? initBreakdownStats();
+
+      // === Aggregate only new responses ===
+      newResponses.forEach((ur: any) => {
         const chosen = ur.content;
+
         // Dimension answers chosen
         const chosenDims: Record<string, string | null> = {};
         dimensions.forEach((d: any) => {
@@ -86,7 +116,6 @@ export default {
           if (!match) return;
           const targetAnswerId = match.documentId;
 
-          // Increment total count for that answer
           breakdownStats[t.documentId][targetAnswerId].totalCount++;
 
           for (const [dimQId, dimAnswerId] of Object.entries(chosenDims)) {
@@ -99,7 +128,7 @@ export default {
         });
       });
 
-      // === Prepare localized maps ===
+      // === Localized maps ===
       const questionTextById: Record<string, string> = {};
       const answerTextById: Record<string, string> = {};
       surveyRaw.questions.forEach((q: any) => {
@@ -109,20 +138,26 @@ export default {
         });
       });
 
-      // === Format into API response ===
+      // === Format for API ===
       const formattedBreakdownStats = Object.entries(breakdownStats).map(
         ([targetId, answersObj]) => {
-          const formattedAnswers = Object.entries(answersObj).map(([ansId, obj]) => ({
-            answer: answerTextById[ansId] || ansId,
-            totalCount: obj.totalCount,
-            breakdowns: Object.entries(obj.dimensions).map(([dimId, dimAnswers]) => ({
-              by: questionTextById[dimId] || dimId,
-              answers: Object.entries(dimAnswers).map(([dimAnswerId, count]) => ({
-                answer: answerTextById[dimAnswerId] || dimAnswerId,
-                count,
-              })),
-            })),
-          }));
+          const formattedAnswers = Object.entries(answersObj).map(
+            ([ansId, obj]: any) => ({
+              answer: answerTextById[ansId] || ansId,
+              totalCount: obj.totalCount,
+              breakdowns: Object.entries(obj.dimensions).map(
+                ([dimId, dimAnswers]: any) => ({
+                  by: questionTextById[dimId] || dimId,
+                  answers: Object.entries(dimAnswers).map(
+                    ([dimAnswerId, count]) => ({
+                      answer: answerTextById[dimAnswerId] || dimAnswerId,
+                      count,
+                    })
+                  ),
+                })
+              ),
+            })
+          );
 
           const questionTotal = formattedAnswers.reduce(
             (sum, a) => sum + a.totalCount,
@@ -137,6 +172,27 @@ export default {
         }
       );
 
+      if (statsMemory) {
+        await strapi.entityService.update(
+          "api::survey-stats-memory.survey-stats-memory",
+          statsMemory.id,
+          {
+            data: {
+              stats: breakdownStats, // use field name matching model
+            },
+          }
+        );
+      } else {
+        await strapi.entityService.create(
+          "api::survey-stats-memory.survey-stats-memory",
+          {
+            data: {
+              survey: surveyId,
+              stats: breakdownStats,
+            },
+          }
+        );
+      }
       ctx.body = {
         aggregatedStats: formattedBreakdownStats,
         locale,

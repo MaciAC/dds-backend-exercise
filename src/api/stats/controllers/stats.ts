@@ -25,6 +25,7 @@ export default {
       const surveyRaw = surveyData[0];
       const surveyId = surveyRaw.id;
       const statsMemoryService = strapi.service('api::survey-stats-memory.survey-stats-memory');
+      const statsService = strapi.service('api::stats.stats');
 
       const statsMemory = await statsMemoryService.getBySurveyId(surveyId);
 
@@ -64,33 +65,7 @@ export default {
       const dimensions = surveyRaw.questions.filter((q: any) => q.toAggregate);
       const targets = surveyRaw.questions.filter((q: any) => !q.toAggregate);
 
-      // === Helper: Build empty stat structure ===
-      const initBreakdownStats = () => {
-        const breakdownStats: any = {};
-        targets.forEach((t: any) => {
-          breakdownStats[t.documentId] = {};
-          t.answers.forEach((ta: any) => {
-            breakdownStats[t.documentId][ta.documentId] = {
-              totalCount: 0,
-              dimensions: {},
-            };
-            dimensions.forEach((d: any) => {
-              breakdownStats[t.documentId][ta.documentId].dimensions[
-                d.documentId
-              ] = {};
-              d.answers.forEach((da: any) => {
-                breakdownStats[t.documentId][ta.documentId].dimensions[
-                  d.documentId
-                ][da.documentId] = 0;
-              });
-            });
-          });
-        });
-        return breakdownStats;
-      };
-
-      // Start stats from memory OR fresh empty
-      let breakdownStats = baselineStats ?? initBreakdownStats();
+      const breakdownStats = statsService.aggregateResponses(newResponses, baselineStats, dimensions, targets);
 
       // === Aggregate only new responses ===
       newResponses.forEach((ur: any) => {
@@ -131,42 +106,10 @@ export default {
         });
       });
 
-      // === Format for API ===
-      const formattedBreakdownStats = Object.entries(breakdownStats).map(
-        ([targetId, answersObj]) => {
-          const formattedAnswers = Object.entries(answersObj).map(
-            ([ansId, obj]: any) => ({
-              answer: answerTextById[ansId] || ansId,
-              totalCount: obj.totalCount,
-              breakdowns: Object.entries(obj.dimensions).map(
-                ([dimId, dimAnswers]: any) => ({
-                  by: questionTextById[dimId] || dimId,
-                  answers: Object.entries(dimAnswers).map(
-                    ([dimAnswerId, count]) => ({
-                      answer: answerTextById[dimAnswerId] || dimAnswerId,
-                      count,
-                    })
-                  ),
-                })
-              ),
-            })
-          );
-
-          const questionTotal = formattedAnswers.reduce(
-            (sum, a) => sum + a.totalCount,
-            0
-          );
-
-          return {
-            question: questionTextById[targetId] || targetId,
-            totalCount: questionTotal,
-            answers: formattedAnswers,
-          };
-        }
-      );
+      const formattedBreakdownStats = statsService.formatAggregatedStats(breakdownStats, surveyRaw.questions);
 
       await statsMemoryService.upsertStatsMemory(surveyId, breakdownStats, statsMemory?.id);
-      
+
       ctx.body = {
         aggregatedStats: formattedBreakdownStats,
         locale,

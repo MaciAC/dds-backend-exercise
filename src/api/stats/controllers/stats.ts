@@ -3,7 +3,6 @@ import { Context } from "koa";
 export default {
   getAggregatedStats: async (ctx: Context) => {
     try {
-      const start_time = Date.now();
       const { surveyDocumentId } = ctx.params;
       const locale = ctx.query.locale || null;
 
@@ -11,7 +10,6 @@ export default {
         ctx.throw(400, "Survey documentId must be provided");
       }
 
-      // === Fetch survey WITH locale ===
       const surveyData = (await strapi.entityService.findMany(
         "api::survey.survey",
         {
@@ -29,7 +27,6 @@ export default {
 
       const statsMemory = await statsMemoryService.getBySurveyId(surveyId);
 
-      // Use stats property, not content
       let baselineStats = null;
       let lastUpdate = null;
 
@@ -55,56 +52,11 @@ export default {
         }
       )) as any[];
 
-      console.log(
-        `Fetched ${newResponses.length} new responses in`,
-        Date.now() - start_time,
-        "ms"
-      );
 
-      // === Questions: separate dimensions vs targets ===
       const dimensions = surveyRaw.questions.filter((q: any) => q.toAggregate);
       const targets = surveyRaw.questions.filter((q: any) => !q.toAggregate);
 
       const breakdownStats = statsService.aggregateResponses(newResponses, baselineStats, dimensions, targets);
-
-      // === Aggregate only new responses ===
-      newResponses.forEach((ur: any) => {
-        const chosen = ur.content;
-
-        // Dimension answers chosen
-        const chosenDims: Record<string, string | null> = {};
-        dimensions.forEach((d: any) => {
-          const match = d.answers.find((a: any) => chosen.includes(a.documentId));
-          chosenDims[d.documentId] = match ? match.documentId : null;
-        });
-
-        // Target answers chosen
-        targets.forEach((t: any) => {
-          const match = t.answers.find((a: any) => chosen.includes(a.documentId));
-          if (!match) return;
-          const targetAnswerId = match.documentId;
-
-          breakdownStats[t.documentId][targetAnswerId].totalCount++;
-
-          for (const [dimQId, dimAnswerId] of Object.entries(chosenDims)) {
-            if (dimAnswerId) {
-              breakdownStats[t.documentId][targetAnswerId].dimensions[dimQId][
-                dimAnswerId
-              ]++;
-            }
-          }
-        });
-      });
-
-      // === Localized maps ===
-      const questionTextById: Record<string, string> = {};
-      const answerTextById: Record<string, string> = {};
-      surveyRaw.questions.forEach((q: any) => {
-        questionTextById[q.documentId] = q.content ?? "";
-        q.answers?.forEach((a: any) => {
-          answerTextById[a.documentId] = a.content ?? "";
-        });
-      });
 
       const formattedBreakdownStats = statsService.formatAggregatedStats(breakdownStats, surveyRaw.questions);
 

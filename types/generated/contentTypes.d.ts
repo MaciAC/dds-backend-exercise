@@ -475,7 +475,7 @@ export interface ApiSurveyStatsMemorySurveyStatsMemory
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
     stats: Schema.Attribute.JSON;
-    survey: Schema.Attribute.Relation<'oneToOne', 'api::survey.survey'>;
+    surveyDocumentId: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

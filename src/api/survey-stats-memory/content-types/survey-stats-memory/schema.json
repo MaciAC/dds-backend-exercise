@@ -11,16 +11,14 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "survey": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::survey.survey"
-    },
     "stats": {
       "type": "json"
     },
     "lastUpdate": {
       "type": "datetime"
+    },
+    "surveyDocumentId": {
+      "type": "string"
     }
   }
 }

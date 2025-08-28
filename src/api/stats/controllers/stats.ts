@@ -25,7 +25,7 @@ export default {
       const statsMemoryService = strapi.service('api::survey-stats-memory.survey-stats-memory');
       const statsService = strapi.service('api::stats.stats');
 
-      const statsMemory = await statsMemoryService.getBySurveyId(surveyId);
+      const statsMemory = await statsMemoryService.getBySurveyDocumentId(surveyDocumentId);
 
       let baselineStats = null;
       let lastUpdate = null;
@@ -39,7 +39,7 @@ export default {
       }
 
       // === Fetch only new responses (if memory exists) or all (if not) ===
-      const responseFilters: any = { survey: surveyId };
+      const responseFilters: any = { survey: { documentId: surveyDocumentId }};
       if (lastUpdate) {
         responseFilters.createdAt = { $gt: lastUpdate }; // only newer responses
       }
@@ -60,7 +60,7 @@ export default {
 
       const formattedBreakdownStats = statsService.formatAggregatedStats(breakdownStats, surveyRaw.questions);
 
-      await statsMemoryService.upsertStatsMemory(surveyId, breakdownStats, statsMemory?.id);
+      await statsMemoryService.upsertStatsMemory(surveyDocumentId, breakdownStats, statsMemory?.id);
 
       ctx.body = {
         aggregatedStats: formattedBreakdownStats,

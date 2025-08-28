@@ -11,15 +11,13 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "answers": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::answer.answer"
-    },
     "survey": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::survey.survey"
+    },
+    "content": {
+      "type": "json"
     }
   }
 }

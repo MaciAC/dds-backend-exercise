@@ -3,46 +3,15 @@ import { Context } from "koa";
 export default {
   getAggregatedStats: async (ctx: Context) => {
     try {
+      const start_time = Date.now();
       const { surveyDocumentId } = ctx.params;
       const locale = ctx.query.locale || null;
 
       if (!surveyDocumentId) {
         ctx.throw(400, "Survey documentId must be provided");
       }
-
-      // Fetch survey WITHOUT locale (stable IDs for aggregation)
-      const surveyDataRaw = (await strapi.entityService.findMany(
-        "api::survey.survey",
-        {
-          filters: { documentId: surveyDocumentId } as any,
-          populate: { questions: { populate: { answers: true } } },
-        }
-      )) as any[];
-
-      if (!surveyDataRaw?.length) ctx.throw(404, "Survey not found");
-      const surveyRaw = surveyDataRaw[0] as any;
-
-      // Load survey entity id
-      const surveyEntities = (await strapi.entityService.findMany(
-        "api::survey.survey",
-        {
-          filters: { documentId: surveyDocumentId } as any,
-        }
-      )) as any[];
-      if (!surveyEntities.length) ctx.throw(404, "Survey not found");
-      const surveyId = surveyEntities[0].id;
-
-      // Fetch responses
-      const userResponses = (await strapi.entityService.findMany(
-        "api::user-response.user-response",
-        {
-          filters: { survey: surveyId } as any,
-          populate: { answers: true },
-        }
-      )) as any[];
-
       // Fetch survey WITH locale
-      const surveyDataLocalized = (await strapi.entityService.findMany(
+      const surveyData = (await strapi.entityService.findMany(
         "api::survey.survey",
         {
           filters: { documentId: surveyDocumentId } as any,
@@ -50,9 +19,20 @@ export default {
           locale,
         }
       )) as any[];
-      if (!surveyDataLocalized?.length) ctx.throw(404, "Survey not found");
-      const surveyLocalized = surveyDataLocalized[0] as any;
 
+      if (!surveyData?.length) ctx.throw(404, "Survey not found");
+      const surveyRaw = surveyData[0] as any;
+      const surveyId = surveyRaw.id;
+
+      // Fetch responses
+      const userResponses = (await strapi.entityService.findMany(
+        "api::user-response.user-response",
+        {
+          filters: { survey: surveyId } as any,
+          fields: ['content'],  // Select only the "content" field
+        }
+      )) as any[];
+      console.log("User Responses took ", Date.now() - start_time, "ms");
       // === Separate dimensions vs targets ===
       const dimensions = surveyRaw.questions.filter((q: any) => q.toAggregate);
       const targets = surveyRaw.questions.filter((q: any) => !q.toAggregate);
@@ -92,9 +72,7 @@ export default {
 
       // === Aggregate ===
       userResponses.forEach((ur: any) => {
-        if (!Array.isArray(ur.answers)) return;
-        const chosen = ur.answers.map((a: any) => a.documentId);
-
+        const chosen = ur.content;
         // Dimension answers chosen
         const chosenDims: Record<string, string | null> = {};
         dimensions.forEach((d: any) => {
@@ -124,7 +102,7 @@ export default {
       // === Prepare localized maps ===
       const questionTextById: Record<string, string> = {};
       const answerTextById: Record<string, string> = {};
-      surveyLocalized.questions.forEach((q: any) => {
+      surveyRaw.questions.forEach((q: any) => {
         questionTextById[q.documentId] = q.content ?? "";
         q.answers?.forEach((a: any) => {
           answerTextById[a.documentId] = a.content ?? "";
@@ -163,6 +141,7 @@ export default {
         aggregatedStats: formattedBreakdownStats,
         locale,
       };
+      console.log("Response took ", Date.now() - start_time, "ms");
     } catch (err: any) {
       ctx.throw(err.status ?? 500, err.message);
     }

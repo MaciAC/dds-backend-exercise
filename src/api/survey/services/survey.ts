@@ -26,5 +26,23 @@ export default factories.createCoreService('api::survey.survey', ({ strapi }) =>
     const { results, pagination } = await super.find(params);
     
     return { results, pagination };
+  },
+  async findOne(id: string | number, ...args) {
+  // If no explicit populate provided, set the default one
+    const params = (args[0] ?? {}) as Params;
+    if (!params.populate) {
+        params.populate = {
+        questions: {
+            populate: {
+            answers: true,
+            },
+        },
+        };
+    }
+
+    // Call super.findOne with the id and modified params
+    const result = await super.findOne(id, params);
+
+    return result;
   }
 }));

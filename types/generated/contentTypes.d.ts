@@ -498,7 +498,7 @@ export interface ApiUserResponseUserResponse
     draftAndPublish: true;
   };
   attributes: {
-    answers: Schema.Attribute.Relation<'oneToMany', 'api::answer.answer'>;
+    content: Schema.Attribute.JSON;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

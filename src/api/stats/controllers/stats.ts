@@ -24,16 +24,9 @@ export default {
       if (!surveyData?.length) ctx.throw(404, "Survey not found");
       const surveyRaw = surveyData[0];
       const surveyId = surveyRaw.id;
+      const statsMemoryService = strapi.service('api::survey-stats-memory.survey-stats-memory');
 
-      // Fetch surveyStatsMemory
-      const statsMemoryArray = await strapi.entityService.findMany(
-        "api::survey-stats-memory.survey-stats-memory",
-        {
-          filters: { survey: surveyId },
-          limit: 1,
-        }
-      );
-      const statsMemory = statsMemoryArray.length ? statsMemoryArray[0] : null;
+      const statsMemory = await statsMemoryService.getBySurveyId(surveyId);
 
       // Use stats property, not content
       let baselineStats = null;
@@ -172,32 +165,12 @@ export default {
         }
       );
 
-      if (statsMemory) {
-        await strapi.entityService.update(
-          "api::survey-stats-memory.survey-stats-memory",
-          statsMemory.id,
-          {
-            data: {
-              stats: breakdownStats, // use field name matching model
-            },
-          }
-        );
-      } else {
-        await strapi.entityService.create(
-          "api::survey-stats-memory.survey-stats-memory",
-          {
-            data: {
-              survey: surveyId,
-              stats: breakdownStats,
-            },
-          }
-        );
-      }
+      await statsMemoryService.upsertStatsMemory(surveyId, breakdownStats, statsMemory?.id);
+      
       ctx.body = {
         aggregatedStats: formattedBreakdownStats,
         locale,
       };
-      console.log("Response took ", Date.now() - start_time, "ms");
     } catch (err: any) {
       ctx.throw(err.status ?? 500, err.message);
     }

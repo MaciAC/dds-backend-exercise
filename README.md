@@ -1,61 +1,25 @@
-# 🚀 Getting started with Strapi
+## Domestic data streamers - backend exercise
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+This is a REST API created using Strapi. It is part of the technical test for the position of Backend Developer at DDS.
 
-### `develop`
+### Installation and running instructions:
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+# prerequisites
+NodeJS, specific version 20.x.x installed on your system. If you don't have it already, I recommend installing it using NVM (Node Version Manager) from https://github.com/nvm-sh/nvm
 
-```
-npm run develop
-# or
-yarn develop
-```
+`nvm install 20`
 
-### `start`
+`nvm use 20`
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
+# installation steps
 
-```
-npm run start
-# or
-yarn start
-```
+1. Clone this repository to your local machine.
+2. Run `nvm use 20` to make sure that Node.js v20.x.x is being used as it is required for Strapi v5.
+3. Install dependencies by running `npm install`.
 
-### `build`
-
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
-
-```
-npm run build
-# or
-yarn build
-```
-
-## ⚙️ Deployment
-
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
-
-```
-yarn strapi deploy
-```
-
-## 📚 Learn more
-
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+# setup 
+4. Start the server with `npm run develop`. The server will be available on http://localhost:1337/
+5. Access to the admin panel in http://localhost:1337/ and create an account. You can access the admin panel after logging in with the credentials provided during registration.
+6. For easier testing we will use the Full-access token generated when creating the user. To get it go to Settings > API Tokens and select the Full access token, then copy the value of the Token field. This token should be included in all requests made to the API as a Bearer token in the Authorization header. You can check the Postman collection that we shared.
+7. Duplicate .env.example file into .env and add the auth token copied before to the corresponding variable AUTH_TOKEN. The other variables are optional and can be left with the default values.
+8. Run the scripts "scripts/create-survey.ts" and "scripts/fill-survey-dummy-data.ts" in order to initialize the database with some dummy data. These scripts will generate surveys and fill them with random answers based on the survey questions.

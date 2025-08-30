@@ -46,6 +46,8 @@ For easier testing we will use the Full-access token generated when creating the
 
 4. Get the full access token by logging in to the admin panel and going to `Settings > API Tokens` and select the Full access token, then copy the value of the Token field. This token should be included in all requests made to the API as a Bearer token in the Authorization header. You can check the Postman collection that we shared.
 
+Strapi is configured so only 'en' locale exists by default. For us to be able to insert data using more languages we need to add them manually. It can only be done through the Admin Panel. Go to `Settings > Internationalization > + Add new locale` and add Spanish ('es') for our case.
+
 Now we will use two scripts to insert some data into our database so we can test the API endpoints.
 
 5. Paste the token in the .env file under AUTH_TOKEN variable.
@@ -60,9 +62,13 @@ AUTH_TOKEN=your_token_here
 ➜ npx ts-node src/scripts/create-survey.ts
 ```
 
-7. Once the survey has been created, run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (it inserts 1000 random userResponses):
+7. Once the survey has been created, run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (by default it creates 50 random userResponses):
 ```
 ➜ npx ts-node src/scripts/fill-survey-dummy-data.ts
+```
+To insert we can pass it as an argument
+```
+➜ npx ts-node src/scripts/fill-survey-dummy-data.ts 1000
 ```
 
 At this point the API endpoints are ready to be tested. The API endpoints are documented in the postman collection that we shared.

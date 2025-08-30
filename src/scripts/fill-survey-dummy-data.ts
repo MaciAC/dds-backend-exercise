@@ -50,23 +50,53 @@ async function postUserResponse(responsePayload) {
   return res.data;
 }
 
-// Example runner: generate N fake responses per survey!
-const N = 500000; // Number of fake users to create
+// Concurrent runner utility to limit parallelism
+async function runConcurrently(items, worker, concurrency) {
+  const results = [];
+  const executing = new Set();
+
+  for (const item of items) {
+    // Run the worker for the current item
+    const p = Promise.resolve().then(() => worker(item));
+    results.push(p);
+
+    // Add the executing promise to the set
+    executing.add(p);
+
+    // When it finishes, remove from set
+    const clean = () => executing.delete(p);
+    p.then(clean).catch(clean);
+
+    // If max concurrency reached, wait for one to finish
+    if (executing.size >= concurrency) {
+      await Promise.race(executing);
+    }
+  }
+  // Wait for all remaining tasks to finish
+  return Promise.all(results);
+}
+
+// Read n_requests and n_concurrent from command-line arguments
+const args = process.argv.slice(2);
+const n_requests = parseInt(args[0], 10) || 50;  // default 50
+const n_concurrent = 5;
 
 (async () => {
   try {
     const surveys = await getSurveys();
     const survey = surveys[0];
-    console.log(`Creating ${N} random responses for: ${survey.description}`);
+    console.log(`Creating ${n_requests} random responses for: ${survey.description}`);
+    console.log(`Using concurrency of ${n_concurrent}`);
 
-    for (let i = 0; i < N; i++) {
-      const responsePayload = generateRandomResponse(survey);
+    const tasks = Array.from({ length: n_requests }, () => generateRandomResponse(survey));
+
+    await runConcurrently(tasks, async (responsePayload, index) => {
       const response = await postUserResponse(responsePayload);
-      console.log(`Submitted response ${i + 1}:`, response);
-    }
+      if (response.errors) throw Error(JSON.stringify(response.errors)); // Throw error on errors
+      return response;
+    }, n_concurrent);
 
     console.log("\nAll random responses have been submitted.");
-
   } catch (err) {
     console.error("Error:", err.response?.data || err.message);
   }

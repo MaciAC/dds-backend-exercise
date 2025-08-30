@@ -22,4 +22,13 @@ NodeJS, specific version 20.x.x installed on your system. If you don't have it a
 5. Access to the admin panel in http://localhost:1337/ and create an account. You can access the admin panel after logging in with the credentials provided during registration.
 6. For easier testing we will use the Full-access token generated when creating the user. To get it go to Settings > API Tokens and select the Full access token, then copy the value of the Token field. This token should be included in all requests made to the API as a Bearer token in the Authorization header. You can check the Postman collection that we shared.
 7. Duplicate .env.example file into .env and add the auth token copied before to the corresponding variable AUTH_TOKEN. The other variables are optional and can be left with the default values.
-8. Run the scripts "scripts/create-survey.ts" and "scripts/fill-survey-dummy-data.ts" in order to initialize the database with some dummy data. These scripts will generate surveys and fill them with random answers based on the survey questions.
+8. Run the script "scripts/create-survey.ts" to create a new survey with the data in scripts/survey-data.json:
+```
+npx ts-node src/scripts/create-survey.ts
+```
+9. Run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (by default it inserts 1000 random userResponses):
+```
+npx ts-node src/scripts/fill-survey-dummy-data.ts
+```
+
+At this point the application is ready to be tested.

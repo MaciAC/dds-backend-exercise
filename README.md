@@ -71,4 +71,49 @@ To insert an specific number of responses instead of the default 50 we can pass 
 ➜ dds-backend-exercise git:(master) npx ts-node src/scripts/fill-survey-dummy-data.ts 1000
 ```
 
-At this point the API endpoints are ready to be tested. The API endpoints are documented in the postman collection that we shared.
+At this point the API endpoints are ready to be tested. The API endpoints are documented in the postman collection that we shared. Or following the steps below.
+
+# API Endpoints
+
+## Get surveys list
+```
+GET /surveys
+
+curl --location 'http://localhost:1337/api/surveys' \
+--header 'Authorization: Bearer {auth_token}'
+```
+## Get survey by documentId and locale
+```
+GET /surveys/{documentId}?locale={locale}
+
+curl --location 'http://localhost:1337/api/surveys/{surveyDocumentId}?locale={locale}' \
+--header 'Authorization: Bearer {auth_token}'
+```
+## Create user response
+This endpoint will validate the answers against the questions of the survey and return an error if any answer does not match with any question or if there are missing answers. If everything goes well it will save the userResponse in the database and return a 201 status code.
+```
+POST /user-responses
+
+curl --location 'http://localhost:1337/api/user-responses' \
+--header 'Authorization: Bearer {auth_token}' \
+--header 'Content-Type: application/json' \
+--data '{
+    "data":{
+        "survey": "surveyDocumentId",
+        "content": [
+            "answerDocumentIdFromQuestion1",
+            "answerDocumentIdFromQuestion2",
+            "answerDocumentIdFromQuestion3",
+            "answerDocumentIdFromQuestion4",
+            "answerDocumentIdFromQuestion5",
+            ]
+    }
+}'
+```
+
+## Get aggregated stats
+This endpoint returns a list of aggregated stats for question of the survey with `toAggregate = false`, aggregating the answers based on the questions with `toAggregate = true`. It returns the questions and answers in the specifiedlocale with their respective counts and totals.
+```
+curl --location 'http://localhost:1337/api/stats/{surveyDocumentId}?locale={es}' \
+--header 'Authorization: Bearer {auth_token}'
+```

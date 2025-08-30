@@ -20,24 +20,24 @@ https://nodejs.org/en/download/
 2. Make sure that Node.js v20.x.x is being used as it is required for Strapi v5.
 ```
 ➜ cd dds-backend-exercise
-➜ nvm use 20
+➜ dds-backend-exercise git:(master) nvm use 20
 ```
 3. Install dependencies.
 ```
-➜ npm install
+➜ dds-backend-exercise git:(master) npm install
 ```
 
 # Setup and start the application
 1. Duplicate .env.example file into .env as per a testing purposes we can left the dummy env vars as they are.
 
 ```
-➜ cp .env.example .env
+➜ dds-backend-exercise git:(master) cp .env.example .env
 ```
 
 2. Start the server. It will be available on http://localhost:1337/
 
 ```
-➜ npm run develop
+➜ dds-backend-exercise git:(master) npm run develop
 ```
 
 3. Access to the admin panel in http://localhost:1337/ and Sign In, this will create an admin user. At this point the Databse structure is created but we have no data yet.
@@ -59,16 +59,16 @@ AUTH_TOKEN=your_token_here
 6. Open a new terminal and run the script "scripts/create-survey.ts" to create a new survey with the data in scripts/survey-data.json (we have created a json file with the sample data from the exercise):
 
 ```
-➜ npx ts-node src/scripts/create-survey.ts
+➜ dds-backend-exercise git:(master) npx ts-node src/scripts/create-survey.ts
 ```
 
 7. Once the survey has been created, run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (by default it creates 50 random userResponses):
 ```
-➜ npx ts-node src/scripts/fill-survey-dummy-data.ts
+➜ dds-backend-exercise git:(master) npx ts-node src/scripts/fill-survey-dummy-data.ts
 ```
-To insert we can pass it as an argument
+To insert an specific number of responses instead of the default 50 we can pass it as an argument
 ```
-➜ npx ts-node src/scripts/fill-survey-dummy-data.ts 1000
+➜ dds-backend-exercise git:(master) npx ts-node src/scripts/fill-survey-dummy-data.ts 1000
 ```
 
 At this point the API endpoints are ready to be tested. The API endpoints are documented in the postman collection that we shared.

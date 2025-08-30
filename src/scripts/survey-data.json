@@ -1,0 +1,168 @@
+{
+    "en": {
+        "description": "Food habits",
+        "questions": [
+            {
+                "content": "How old are you?",
+                "toAggregate": true,
+                "answers": [
+                    {
+                        "content": "Under 16"
+                    },
+                    {
+                        "content": "Between 16 and 35"
+                    },
+                    {
+                        "content": "Between 35 and 55"
+                    },
+                    {
+                        "content": "Over 55"
+                    }
+                ]
+            },
+            {
+                "content": "What diet do you follow?",
+                "toAggregate": true,
+                "answers": [
+                    {
+                        "content": "Omnivore (I eat everything)"
+                    },
+                    {
+                        "content": "Vegetarian"
+                    },
+                    {
+                        "content": "Vegan"
+                    },
+                    {
+                        "content": "Pescatarian"
+                    },
+                    {
+                        "content": "Flexitarian"
+                    },
+                    {
+                        "content": "Other"
+                    }
+                ]
+            },
+            {
+                "content": "Can the meat problem be solved with veggie burgers?",
+                "toAggregate": false,
+                "answers": [
+                    {
+                        "content": "I think it's a step in the right direction."
+                    },
+                    {
+                        "content": "I doubt it because there are also environmental impacts associated with production."
+                    }
+                ]
+            },
+            {
+                "content": "How can we reduce the use of plastic packaging?",
+                "toAggregate": false,
+                "answers": [
+                    {
+                        "content": "Above all by raising awareness."
+                    },
+                    {
+                        "content": "Above all by introducing laws and taxes."
+                    }
+                ]
+            },
+            {
+                "content": "What percentage of local products will there be in your next grocery shop?",
+                "toAggregate": false,
+                "answers": [
+                    {
+                        "content": "Less than 50% of everything I buy."
+                    },
+                    {
+                        "content": "Over 50% of everything I buy."
+                    }
+                ]
+            }
+        ]
+    },
+    "es": {
+        "description": "Hábitos alimenticios",
+        "questions": [
+            {
+                "content": "¿Cuántos años tienes?",
+                "toAggregate": true,
+                "answers": [
+                    {
+                        "content": "Menos de 16"
+                    },
+                    {
+                        "content": "Entre 16 y 35"
+                    },
+                    {
+                        "content": "Entre 35 y 55"
+                    },
+                    {
+                        "content": "Más de 55"
+                    }
+                ]
+            },
+            {
+                "content": "¿Qué dieta sigues?",
+                "toAggregate": true,
+                "answers": [
+                    {
+                        "content": "Omnívoro (como de todo)"
+                    },
+                    {
+                        "content": "Vegetariano"
+                    },
+                    {
+                        "content": "Vegano"
+                    },
+                    {
+                        "content": "Pescatariano"
+                    },
+                    {
+                        "content": "Flexitariano"
+                    },
+                    {
+                        "content": "Otro"
+                    }
+                ]
+            },
+            {
+                "content": "¿Se puede resolver el problema de la carne con hamburguesas vegetarianas?",
+                "toAggregate": false,
+                "answers": [
+                    {
+                        "content": "Creo que es un paso en la dirección correcta."
+                    },
+                    {
+                        "content": "Dudo porque también hay impactos ambientales asociados con la producción."
+                    }
+                ]
+            },
+            {
+                "content": "¿Cómo podemos reducir el uso de envases de plástico?",
+                "toAggregate": false,
+                "answers": [
+                    {
+                        "content": "Sobre todo concienciando."
+                    },
+                    {
+                        "content": "Sobre todo introduciendo leyes e impuestos."
+                    }
+                ]
+            },
+            {
+                "content": "¿Qué porcentaje de productos locales habrá en su próxima compra de supermercado?",
+                "toAggregate": false,
+                "answers": [
+                    {
+                        "content": "Menos del 50% de todo lo que compro."
+                    },
+                    {
+                        "content": "Más del 50% de todo lo que compro."
+                    }
+                ]
+            }
+        ]
+    }
+}

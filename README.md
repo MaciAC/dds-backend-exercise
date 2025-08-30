@@ -57,12 +57,12 @@ AUTH_TOKEN=your_token_here
 6. Open a new terminal and run the script "scripts/create-survey.ts" to create a new survey with the data in scripts/survey-data.json (we have created a json file with the sample data from the exercise):
 
 ```
-npx ts-node src/scripts/create-survey.ts
+➜ npx ts-node src/scripts/create-survey.ts
 ```
 
 7. Once the survey has been created, run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (it inserts 1000 random userResponses):
 ```
-npx ts-node src/scripts/fill-survey-dummy-data.ts
+➜ npx ts-node src/scripts/fill-survey-dummy-data.ts
 ```
 
 At this point the API endpoints are ready to be tested. The API endpoints are documented in the postman collection that we shared.

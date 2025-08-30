@@ -178,21 +178,26 @@ async function createLocalizedSurvey(locale: Locale) {
 }
 
 async function main() {
+  console.log('Creating surveys...');
+  console.log('Locales:', locales.join(', '));
   // 1) Answers
   await createEnglishAnswers();
   for (const locale of locales) {
+    console.log(`Creating localized answers for locale "${locale}"...`);
     await createLocalizedAnswers(locale);
   }
 
   // 2) Questions
   await createEnglishQuestions();
   for (const locale of locales) {
+    console.log(`Creating localized questions for locale "${locale}"...`);
     await createLocalizedQuestions(locale);
   }
 
   // 3) Survey
   await createEnglishSurvey();
   for (const locale of locales) {
+    console.log(`Creating localized survey for locale "${locale}"...`);
     await createLocalizedSurvey(locale);
   }
 

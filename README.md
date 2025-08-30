@@ -4,35 +4,65 @@ This is a REST API created using Strapi. It is part of the technical test for th
 
 ### Installation and running instructions:
 
-# prerequisites
-NodeJS, specific version 20.x.x installed on your system. If you don't have it already, I recommend installing it using NVM (Node Version Manager) from https://github.com/nvm-sh/nvm
-
-`nvm install 20`
-
-`nvm use 20`
-
-# installation steps
+# Pre-requisites
+Node js 20 as it is required for Strapi v5. Recommended way to manage different versions of node is nvm:
+https://nodejs.org/en/download/
+```
+➜ nvm install 20
+➜ nvm use 20
+```
+# Installation
 
 1. Clone this repository to your local machine.
-2. Run `nvm use 20` to make sure that Node.js v20.x.x is being used as it is required for Strapi v5.
-3. Install dependencies by running `npm install`.
-4. Duplicate .env.example file into .env as per a testing purposes we can left the dummy env vars as they are.
+```
+➜ git clone git@github.com:MaciAC/dds-backend-exercise.git
+```
+2. Make sure that Node.js v20.x.x is being used as it is required for Strapi v5.
+```
+➜ cd dds-backend-exercise
+➜ nvm use 20
+```
+3. Install dependencies.
+```
+➜ npm install
+```
 
-# setup 
-5. Start the server with `npm run develop`. The server will be available on http://localhost:1337/
-6. Access to the admin panel in http://localhost:1337/ and create an account. You can access the admin panel after logging in with the credentials provided during registration.
-7. For easier testing we will use the Full-access token generated when creating the user. To get it go to Settings > API Tokens and select the Full access token, then copy the value of the Token field. This token should be included in all requests made to the API as a Bearer token in the Authorization header. You can check the Postman collection that we shared.
-8. Paste the copied token in hte .env file under AUTH_TOKEN variable.
+# Setup and start the application
+1. Duplicate .env.example file into .env as per a testing purposes we can left the dummy env vars as they are.
+
+```
+➜ cp .env.example .env
+```
+
+2. Start the server. It will be available on http://localhost:1337/
+
+```
+➜ npm run develop
+```
+
+3. Access to the admin panel in http://localhost:1337/ and Sign In, this will create an admin user. At this point the Databse structure is created but we have no data yet.
+
+For easier testing we will use the Full-access token generated when creating the user. In a prodution environment we would create a dedicated tokens for each service or client with the only needed permissions.
+
+4. Get the full access token by logging in to the admin panel and going to `Settings > API Tokens` and select the Full access token, then copy the value of the Token field. This token should be included in all requests made to the API as a Bearer token in the Authorization header. You can check the Postman collection that we shared.
+
+Now we will use two scripts to insert some data into our database so we can test the API endpoints.
+
+5. Paste the token in the .env file under AUTH_TOKEN variable.
+
 ```
 AUTH_TOKEN=your_token_here
 ```
-9. Open a new terminal and run the script "scripts/create-survey.ts" to create a new survey with the data in scripts/survey-data.json (we have created a json file with the sample data from the exercise):
+
+6. Open a new terminal and run the script "scripts/create-survey.ts" to create a new survey with the data in scripts/survey-data.json (we have created a json file with the sample data from the exercise):
+
 ```
 npx ts-node src/scripts/create-survey.ts
 ```
-10. Once the survey has been created, run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (by default it inserts 1000 random userResponses):
+
+7. Once the survey has been created, run the script "scripts/fill-survey-dummy-data.ts" to fill the survey with dummy data (it inserts 1000 random userResponses):
 ```
 npx ts-node src/scripts/fill-survey-dummy-data.ts
 ```
 
-At this point the API endpoints are ready to be tested.
+At this point the API endpoints are ready to be tested. The API endpoints are documented in the postman collection that we shared.
